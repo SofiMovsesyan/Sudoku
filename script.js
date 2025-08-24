@@ -1,6 +1,9 @@
 let container = document.getElementById("container")
 let game = document.getElementById("game")
 
+let pTimer = document.getElementById("timer")
+let pBest = document.getElementById("best")
+
 let easy = document.getElementById("easy")
 let middle = document.getElementById("middle")
 let hard = document.getElementById("hard")
@@ -11,7 +14,15 @@ let btn = document.getElementById("btn")
 let diffNum = 0
 let lvlSelected = null
 
-let table, tr, td, numBtn, matrix
+let table, tr, td, numBtn, matrix, win
+
+let min = 0
+let s = 0
+let ms = 0
+let time
+
+let bestScore = 0
+let curScore;
 
 btnClick()
 btn.addEventListener("click", () => {
@@ -20,17 +31,17 @@ btn.addEventListener("click", () => {
         return
     }
     gameStart()
-    
+
 
 })
 
 function gameStart() {
     btn.innerHTML = "REFRESH"
-    // win = false
-    // min = 0
-    // s = 0
-    // ms = 0
-    // timer()
+    win = false
+    min = 0
+    s = 0
+    ms = 0
+    timer()
     matrix = Array.from({ length: 9 }, () => {
         return Array(9).fill(0)
     })
@@ -41,9 +52,9 @@ function gameStart() {
 }
 
 function lvlSelection(lvl) {
-lvlSelect = true
+    lvlSelect = true
     if (lvlSelected) {
-        
+
         lvlSelected.style.backgroundColor = ""
     }
     lvl.style.backgroundColor = "rgb(31, 92, 176)"
@@ -51,27 +62,68 @@ lvlSelect = true
 }
 
 function btnClick() {
-    easy.addEventListener("click", ()=>{
-        diffNum = 35
-    lvlSelection(easy)
-    
-})
+    easy.addEventListener("click", () => {
+        diffNum = 5
+        lvlSelection(easy)
 
-middle.addEventListener("click", ()=>{
+    })
+
+    middle.addEventListener("click", () => {
         diffNum = 45
-    lvlSelection(middle)
-})
+        lvlSelection(middle)
+    })
 
-hard.addEventListener("click", ()=>{
-    diffNum = 55
-    lvlSelection(hard)
-})
+    hard.addEventListener("click", () => {
+        diffNum = 55
+        lvlSelection(hard)
+    })
 
-impossible.addEventListener("click", ()=>{
-    diffNum = 60
-    lvlSelection(impossible)
-})
+    impossible.addEventListener("click", () => {
+        diffNum = 60
+        lvlSelection(impossible)
+    })
 }
+
+
+function timeToMs(timeStr) {
+    let [min, time] = timeStr.split(":")
+
+    let [sec, ms] = time.split(".")
+    console.log(min, sec);
+    let toMs = parseInt(min) * 60000 + parseInt(sec) * 1000 + parseInt(ms)
+    return toMs
+}
+
+function timer() {
+
+    time = setInterval(() => {
+        if (win == true) {
+            clearInterval(time)
+            curScore = timeToMs(pTimer.innerHTML.replace("Time:", " "))
+
+            if (bestScore == 0 || bestScore > curScore) {
+                bestScore = curScore
+                pBest.innerHTML = `Best: ${min}:${s.toString().padStart(2, "0")}.${ms.toString().padStart(3, "0")}`
+            }
+
+        }
+
+        if (ms >= 100) {
+            ms = 0
+            s++
+        }
+
+        if (s >= 60) {
+            s = 0
+            min++
+        }
+        pTimer.innerHTML = `Time: ${min}:${s.toString().padStart(2, "0")}.${ms.toString().padStart(3, "0")}`
+
+        ms++
+    }, 10);
+}
+
+
 
 
 
@@ -118,21 +170,24 @@ function numBtnCreate() {
         return
     }
     for (let i = 1; i <= 9; i++) {
-numBtn = document.createElement("button")
+        numBtn = document.createElement("button")
         numBtn.classList.add("numBtn");
 
-        numBtn.innerHTML = i 
-        game.append(numBtn)        
+        numBtn.innerHTML = i
+        game.append(numBtn)
     }
 }
 
 function isValid(num, row, col) {
-    if (matrix[row].includes(num)) {
-        return false
+    for (let j = 0; j < matrix.length; j++) {
+        if (j !== col && matrix[row][j] === num) {
+            return false
+        }
     }
 
+
     for (let i = 0; i < matrix.length; i++) {
-        if (matrix[i][col] === num) {
+        if (i !== row && matrix[i][col] === num) {
             return false
         }
     }
@@ -141,7 +196,9 @@ function isValid(num, row, col) {
     let blockColStart = col - (col % 3)
     for (let i = 0; i < 3; i++) {
         for (let j = 0; j < 3; j++) {
-            if (matrix[blockRowStart + i][blockColStart + j] === num) {
+            let r = blockRowStart + i
+            let c = blockColStart + j
+            if ((r!== row || c!==col) && matrix[r][c] === num) {
                 return false
             }
         }
@@ -194,18 +251,15 @@ function removeNums(n) {
     for (let i = 0; i < n; i++) {
         let rowRandNum = Math.floor(Math.random() * 9)
         let colRandNum = Math.floor(Math.random() * 9)
-        
+
         matrix[rowRandNum][colRandNum] = null
     }
 }
-
-
 
 let selected = null
 function numberSelect() {
     let tds = document.querySelectorAll("td")
     let numBtn = document.querySelectorAll(".numBtn")
-    // let count = 1
 
     tds.forEach(td => {
         td.addEventListener("click", () => {
@@ -237,19 +291,45 @@ function numberSelect() {
                         selected.style.backgroundColor = "rgb(163, 200, 251)"
                         selected = null
                     }, 1000);
-                }else{
-                     selected.style.backgroundColor = "red"
-                    selected.innerHTML = num
 
-                    setTimeout(() => {
-                        selected.style.backgroundColor = "rgb(163, 200, 251)"
-                        selected.innerHTML = ""
-                        selected = null
-                    }, 1000); 
+
                 }
+            
+            else {
+                selected.style.backgroundColor = "red"
+                selected.innerHTML = num
+
+                setTimeout(() => {
+                    selected.style.backgroundColor = "rgb(163, 200, 251)"
+                    selected.innerHTML = ""
+                    selected = null
+                }, 1000);
+            }
+        }
+            if (winner()) {
+                win = true
+                alert("You win!")
+                // txt.innerHTML = "YOU WIN!"
+                // txt.style.fontSize = "27px"
+                // txt.style.color = "green"
+                setTimeout(() => {
+                    // txt.innerHTML = ""
+                    gameStart()
+                }, 1000);
             }
 
 
         })
     })
+}
+
+function winner() {
+    for (let i = 0; i < matrix.length; i++) {
+        for (let j = 0; j < matrix[i].length; j++) {
+            if (matrix[i][j] == null) {
+                return false
+            }
+        }
+    }
+    return true
 }
