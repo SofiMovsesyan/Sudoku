@@ -21,6 +21,14 @@ width: 100vw;
     gap: 300px;
 }
 
+#info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+}
+
 h1 {
     font-size: 50px;
 }
@@ -53,19 +61,35 @@ img {
     font-size: 22px;
 }
 
+p {
+    font-size: 22px;
+    margin-left: 10px;
+}
+
 
 #txt {
     height: 10px;
 }
 
-#btn {
+.lvl {
     width: 100px;
     height: 44px;
     border-radius: 20px;
     border: 1px solid rgb(140, 244, 207);
     background-color: rgb(114, 170, 249);
     color: rgb(217, 249, 238);
+
 }
+
+#btn {
+    width: 140px;
+    height: 50px;
+    border-radius: 20px;
+    border: 1px solid rgb(88, 93, 238);
+    background-color: rgb(42, 118, 224);
+}
+
+
 
 .numBtn {
     width: 45px;

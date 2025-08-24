@@ -1,25 +1,79 @@
 let container = document.getElementById("container")
 let game = document.getElementById("game")
-let table, tr, td, numBtn
-let matrix = Array.from({ length: 9 }, () => {
-    return Array(9).fill(0)
+
+let easy = document.getElementById("easy")
+let middle = document.getElementById("middle")
+let hard = document.getElementById("hard")
+let impossible = document.getElementById("impossible")
+
+let btn = document.getElementById("btn")
+
+let diffNum = 0
+let lvlSelected = null
+
+let table, tr, td, numBtn, matrix
+
+btnClick()
+btn.addEventListener("click", () => {
+    if (!diffNum) {
+        alert("You must select difficulty level first!")
+        return
+    }
+    gameStart()
+    
+
 })
-console.log(matrix);
-
-
-gameStart()
 
 function gameStart() {
-    // btn.innerHTML = "REFRESH"
+    btn.innerHTML = "REFRESH"
     // win = false
     // min = 0
     // s = 0
     // ms = 0
     // timer()
+    matrix = Array.from({ length: 9 }, () => {
+        return Array(9).fill(0)
+    })
+    numBtnCreate()
 
     createSudokuTable()
     numberSelect()
 }
+
+function lvlSelection(lvl) {
+lvlSelect = true
+    if (lvlSelected) {
+        
+        lvlSelected.style.backgroundColor = ""
+    }
+    lvl.style.backgroundColor = "rgb(31, 92, 176)"
+    lvlSelected = lvl
+}
+
+function btnClick() {
+    easy.addEventListener("click", ()=>{
+        diffNum = 35
+    lvlSelection(easy)
+    
+})
+
+middle.addEventListener("click", ()=>{
+        diffNum = 45
+    lvlSelection(middle)
+})
+
+hard.addEventListener("click", ()=>{
+    diffNum = 55
+    lvlSelection(hard)
+})
+
+impossible.addEventListener("click", ()=>{
+    diffNum = 60
+    lvlSelection(impossible)
+})
+}
+
+
 
 function createSudokuTable() {
     fillSudoku(0, 0)
@@ -55,13 +109,21 @@ function createSudokuTable() {
             tr.appendChild(td)
         }
         table.appendChild(tr)
-        numBtn = document.createElement("button")
+    }
+}
+
+function numBtnCreate() {
+    const numBtns = container.querySelectorAll(".numBtn")
+    if (numBtns.length > 0) {
+        return
+    }
+    for (let i = 1; i <= 9; i++) {
+numBtn = document.createElement("button")
         numBtn.classList.add("numBtn");
 
-        numBtn.innerHTML = i + 1
-        game.append(numBtn)
+        numBtn.innerHTML = i 
+        game.append(numBtn)        
     }
-
 }
 
 function isValid(num, row, col) {
@@ -98,7 +160,7 @@ function shuffle(arr) {
 
 function fillSudoku(row, col) {
     if (row == 9) {
-        removeNums(30)
+        removeNums(diffNum)
         return true
     }
 
@@ -132,6 +194,7 @@ function removeNums(n) {
     for (let i = 0; i < n; i++) {
         let rowRandNum = Math.floor(Math.random() * 9)
         let colRandNum = Math.floor(Math.random() * 9)
+        
         matrix[rowRandNum][colRandNum] = null
     }
 }
