@@ -4,17 +4,21 @@
     box-sizing: border-box;
 }
 
-#container {
-    width: 100vw;
+body {
+width: 100vw;
     height: 100vh;
     background-color: rgb(217, 249, 238);
     text-align: center;
     color: rgb(1, 1, 65);
+}
+
+#container {
+    padding-top: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
-    gap: 20px;
+    /* flex-direction: column; */
+    gap: 300px;
 }
 
 h1 {
@@ -35,4 +39,40 @@ td {
     border: 1px solid rgb(1, 1, 65);
     width: 50px;
     height: 50px;
+}
+
+
+img {
+    width: 23px;
+    height: 23px;
+    margin: 2px;
+}
+
+.container2 {
+    display: flex;
+    font-size: 22px;
+}
+
+
+#txt {
+    height: 10px;
+}
+
+#btn {
+    width: 100px;
+    height: 44px;
+    border-radius: 20px;
+    border: 1px solid rgb(140, 244, 207);
+    background-color: rgb(114, 170, 249);
+    color: rgb(217, 249, 238);
+}
+
+.numBtn {
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
+    border: 1px solid rgb(36, 6, 168);
+    background-color: rgb(31, 92, 176);
+    color: rgb(217, 249, 238);
+    margin: 10px 1px;
 }

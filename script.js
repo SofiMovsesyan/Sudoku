@@ -1,5 +1,6 @@
 let container = document.getElementById("container")
-let table, tr, td
+let game = document.getElementById("game")
+let table, tr, td, numBtn
 let matrix = Array.from({ length: 9 }, () => {
     return Array(9).fill(0)
 })
@@ -17,19 +18,19 @@ function gameStart() {
     // timer()
 
     createSudokuTable()
-    // numberSelect()
+    numberSelect()
 }
 
 function createSudokuTable() {
     fillSudoku(0, 0)
     let rowBorder = 0
     let colBorder = 0
-    table = container.getElementsByTagName("table")
+    table = game.getElementsByTagName("table")
     if (table.length > 0) {
         table[0].remove()
     }
     table = document.createElement("table")
-    container.appendChild(table)
+    game.appendChild(table)
     for (let i = 0; i < 9; i++) {
         tr = document.createElement("tr")
         rowBorder++
@@ -54,10 +55,14 @@ function createSudokuTable() {
             tr.appendChild(td)
         }
         table.appendChild(tr)
+        numBtn = document.createElement("button")
+        numBtn.classList.add("numBtn");
+
+        numBtn.innerHTML = i + 1
+        game.append(numBtn)
     }
+
 }
-
-
 
 function isValid(num, row, col) {
     if (matrix[row].includes(num)) {
@@ -70,15 +75,15 @@ function isValid(num, row, col) {
         }
     }
 
-    let blockRowStart = row - (row%3)
-    let blockColStart = col - (col%3)
+    let blockRowStart = row - (row % 3)
+    let blockColStart = col - (col % 3)
     for (let i = 0; i < 3; i++) {
         for (let j = 0; j < 3; j++) {
             if (matrix[blockRowStart + i][blockColStart + j] === num) {
                 return false
-            }            
+            }
         }
-        
+
     }
     return true
 }
@@ -93,6 +98,7 @@ function shuffle(arr) {
 
 function fillSudoku(row, col) {
     if (row == 9) {
+        removeNums(30)
         return true
     }
 
@@ -105,8 +111,8 @@ function fillSudoku(row, col) {
 
     let nums = []
     for (let i = 1; i <= 9; i++) {
-        nums.push(i)        
-    }        
+        nums.push(i)
+    }
     nums = shuffle(nums)
 
     for (let i = 0; i < nums.length; i++) {
@@ -119,4 +125,68 @@ function fillSudoku(row, col) {
         }
     }
     return false
+
+}
+
+function removeNums(n) {
+    for (let i = 0; i < n; i++) {
+        let rowRandNum = Math.floor(Math.random() * 9)
+        let colRandNum = Math.floor(Math.random() * 9)
+        matrix[rowRandNum][colRandNum] = null
+    }
+}
+
+
+
+let selected = null
+function numberSelect() {
+    let tds = document.querySelectorAll("td")
+    let numBtn = document.querySelectorAll(".numBtn")
+    // let count = 1
+
+    tds.forEach(td => {
+        td.addEventListener("click", () => {
+            if (selected) {
+                selected.style.backgroundColor = "rgb(163, 200, 251)"
+                selected.style.transform = "scale(1)"
+            }
+
+            if (td.innerHTML == "") {
+                selected = td
+                selected.style.backgroundColor = "rgb(61, 134, 238)"
+            }
+        })
+    });
+
+    numBtn.forEach(btn => {
+        btn.style.marginLeft = "5px"
+        btn.addEventListener("click", () => {
+            if (selected) {
+                let row = selected.parentElement.rowIndex
+                let col = selected.cellIndex
+                let num = parseInt(btn.innerHTML)
+                if (isValid(num, row, col)) {
+                    selected.style.backgroundColor = "green"
+                    selected.innerHTML = num
+                    matrix[row][col] = num
+
+                    setTimeout(() => {
+                        selected.style.backgroundColor = "rgb(163, 200, 251)"
+                        selected = null
+                    }, 1000);
+                }else{
+                     selected.style.backgroundColor = "red"
+                    selected.innerHTML = num
+
+                    setTimeout(() => {
+                        selected.style.backgroundColor = "rgb(163, 200, 251)"
+                        selected.innerHTML = ""
+                        selected = null
+                    }, 1000); 
+                }
+            }
+
+
+        })
+    })
 }
