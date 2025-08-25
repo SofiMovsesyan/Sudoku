@@ -10,6 +10,10 @@ let hard = document.getElementById("hard")
 let impossible = document.getElementById("impossible")
 
 let btn = document.getElementById("btn")
+let wrongTxt = document.getElementById("wrong")
+let txt = document.getElementById("txt")
+
+let wrong
 
 let diffNum = 0
 let lvlSelected = null
@@ -36,11 +40,16 @@ btn.addEventListener("click", () => {
 })
 
 function gameStart() {
+    if(time) {
+        clearInterval(time)
+    }
     btn.innerHTML = "REFRESH"
     win = false
     min = 0
     s = 0
     ms = 0
+    wrong = 0
+    wrongTxt.innerHTML = "Wrong: 0"
     timer()
     matrix = Array.from({ length: 9 }, () => {
         return Array(9).fill(0)
@@ -63,7 +72,7 @@ function lvlSelection(lvl) {
 
 function btnClick() {
     easy.addEventListener("click", () => {
-        diffNum = 5
+        diffNum = 32
         lvlSelection(easy)
 
     })
@@ -79,7 +88,7 @@ function btnClick() {
     })
 
     impossible.addEventListener("click", () => {
-        diffNum = 60
+        diffNum = 65
         lvlSelection(impossible)
     })
 }
@@ -198,7 +207,7 @@ function isValid(num, row, col) {
         for (let j = 0; j < 3; j++) {
             let r = blockRowStart + i
             let c = blockColStart + j
-            if ((r!== row || c!==col) && matrix[r][c] === num) {
+            if ((r !== row || c !== col) && matrix[r][c] === num) {
                 return false
             }
         }
@@ -258,8 +267,19 @@ function removeNums(n) {
 
 let selected = null
 function numberSelect() {
-    let tds = document.querySelectorAll("td")
-    let numBtn = document.querySelectorAll(".numBtn")
+    tds = document.querySelectorAll("td")
+    numBtns = document.querySelectorAll(".numBtn")
+
+    tds.forEach(td => {
+        td.replaceWith(td.cloneNode(true)) 
+    })
+
+    numBtns.forEach(btn => {
+        btn.replaceWith(btn.cloneNode(true)) 
+    })
+
+    tds = document.querySelectorAll("td")
+ numBtn = [...document.querySelectorAll(".numBtn")]
 
     tds.forEach(td => {
         td.addEventListener("click", () => {
@@ -294,32 +314,50 @@ function numberSelect() {
 
 
                 }
-            
-            else {
-                selected.style.backgroundColor = "red"
-                selected.innerHTML = num
 
-                setTimeout(() => {
-                    selected.style.backgroundColor = "rgb(163, 200, 251)"
-                    selected.innerHTML = ""
-                    selected = null
-                }, 1000);
+                else {
+                    selected.style.backgroundColor = "red"
+                    selected.innerHTML = num
+                    wrong++
+                    wrongTxt.innerHTML = `Wrong: ${wrong}`
+
+                    if (wrong >= 3) {
+                        selected.style.backgroundColor = "red"
+                        txt.innerHTML = "YOU LOST!"
+                        txt.style.fontSize = "25px"
+                        txt.style.color = "red"
+                        setTimeout(() => {
+                            txt.innerHTML = ""
+                            selected.style.backgroundColor = "rgb(163, 200, 251)"
+                            selected.innerHTML = ""
+                            selected = null
+                            wrong = 0
+                            gameStart()
+                        }, 1000);
+                        return
+                    }
+
+                    setTimeout(() => {
+                        selected.style.backgroundColor = "rgb(163, 200, 251)"
+                        selected.innerHTML = ""
+                        selected = null
+                    }, 1000);
+                }
             }
-        }
+
             if (winner()) {
                 win = true
-                alert("You win!")
-                // txt.innerHTML = "YOU WIN!"
-                // txt.style.fontSize = "27px"
-                // txt.style.color = "green"
+                txt.innerHTML = "YOU WIN!"
+                txt.style.fontSize = "27px"
+                txt.style.color = "green"
                 setTimeout(() => {
-                    // txt.innerHTML = ""
+                    txt.innerHTML = ""
                     gameStart()
                 }, 1000);
             }
-
-
         })
+
+
     })
 }
 
